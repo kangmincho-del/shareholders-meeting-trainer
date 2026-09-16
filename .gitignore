@@ -1,0 +1,14 @@
+*.docx
+*.doc
+*.pdf
+*.xlsx
+*.xls
+*.pptx
+*.hwp
+*.hwpx
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.swp
