@@ -1,0 +1,435 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>주총 진행 트레이너</title>
+<meta name="description" content="정기주주총회를 준비·진행·마무리하는 절차를 문제로 익히는 학습 게임. 의장 시뮬레이션 14문항, 순서 맞추기, O/X 퀴즈.">
+<meta name="theme-color" content="#2f5d50" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16181a" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+
+<!-- 카카오톡·메신저 공유 미리보기 -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="주총 진행 트레이너">
+<meta property="og:description" content="정기주주총회 절차를 문제로 익히는 학습 게임 · 의장 시뮬레이션 · 순서 맞추기 · O/X 퀴즈">
+<meta property="og:url" content="https://kangmincho-del.github.io/shareholders-meeting-trainer/">
+<meta property="og:image" content="https://kangmincho-del.github.io/shareholders-meeting-trainer/thumbnail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="주총 진행 트레이너 — 정기주주총회 절차 학습 게임">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="주총 진행 트레이너">
+<meta name="twitter:description" content="정기주주총회 절차를 문제로 익히는 학습 게임">
+<meta name="twitter:image" content="https://kangmincho-del.github.io/shareholders-meeting-trainer/thumbnail.png">
+<style>
+:root{
+  --bg:#f6f5f2; --surface:#fff; --line:#e2ded6; --text:#1f1d1a; --muted:#6b665e;
+  --accent:#2f5d50; --accent-soft:#e6efeb; --ok:#2f7a4f; --bad:#b04432; --warn:#a9762a;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#16181a; --surface:#1f2225; --line:#33383c; --text:#eceae6; --muted:#9aa0a5;
+    --accent:#7fc3ac; --accent-soft:#24312e; --ok:#6cc48c; --bad:#e08b78; --warn:#d6ae6a;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16181a; --surface:#1f2225; --line:#33383c; --text:#eceae6; --muted:#9aa0a5;
+  --accent:#7fc3ac; --accent-soft:#24312e; --ok:#6cc48c; --bad:#e08b78; --warn:#d6ae6a;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0; overflow-x:hidden}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  line-height:1.6; -webkit-font-smoothing:antialiased;
+  min-height:100svh;
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior-y:contain;
+}
+button{touch-action:manipulation}
+.wrap{
+  max-width:780px; margin:0 auto;
+  padding:32px 16px calc(72px + env(safe-area-inset-bottom));
+  padding-left:max(16px, env(safe-area-inset-left));
+  padding-right:max(16px, env(safe-area-inset-right));
+}
+header{margin-bottom:24px}
+h1{font-size:1.5rem; margin:0 0 4px; letter-spacing:-.02em}
+.sub{color:var(--muted); font-size:.9rem; margin:0}
+.card{
+  background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:20px; box-shadow:var(--shadow); margin-bottom:16px;
+}
+.tabs{display:flex; gap:8px; margin:20px 0 18px; flex-wrap:wrap}
+.tab{
+  border:1px solid var(--line); background:var(--surface); color:var(--muted);
+  padding:8px 14px; border-radius:999px; font-size:.88rem; cursor:pointer; font-family:inherit;
+}
+.tab[aria-selected="true"]{background:var(--accent); border-color:var(--accent); color:var(--surface); font-weight:600}
+.bar{height:6px; background:var(--line); border-radius:999px; overflow:hidden; margin:14px 0 6px}
+.bar > i{display:block; height:100%; background:var(--accent); width:0; transition:width .3s}
+.meta{display:flex; justify-content:space-between; font-size:.8rem; color:var(--muted)}
+.q{font-size:1.08rem; font-weight:600; margin:6px 0 4px; letter-spacing:-.01em}
+.stage{font-size:.78rem; color:var(--accent); font-weight:700; letter-spacing:.04em}
+.situ{color:var(--muted); font-size:.92rem; margin:8px 0 16px; white-space:pre-wrap}
+.opts{display:flex; flex-direction:column; gap:8px}
+.opt{
+  text-align:left; width:100%; padding:13px 15px; border-radius:10px; cursor:pointer;
+  border:1px solid var(--line); background:var(--surface); color:var(--text);
+  font:inherit; font-size:.95rem; transition:border-color .15s, background .15s;
+}
+.opt:hover:not(:disabled){border-color:var(--accent); background:var(--accent-soft)}
+.opt:disabled{cursor:default; opacity:.65}
+.opt.right{border-color:var(--ok); background:color-mix(in srgb,var(--ok) 12%,transparent); opacity:1; font-weight:600}
+.opt.wrong{border-color:var(--bad); background:color-mix(in srgb,var(--bad) 12%,transparent); opacity:1}
+.fb{margin-top:14px; padding:13px 15px; border-radius:10px; border-left:3px solid var(--accent); background:var(--accent-soft); font-size:.9rem}
+.fb b{display:block; margin-bottom:3px}
+.law{display:inline-block; margin-top:8px; font-size:.78rem; color:var(--muted); font-family:ui-monospace,Menlo,monospace}
+.row{display:flex; gap:8px; margin-top:16px; flex-wrap:wrap}
+button.main{
+  background:var(--accent); color:var(--surface); border:none; border-radius:10px;
+  padding:11px 20px; font:inherit; font-weight:600; font-size:.92rem; cursor:pointer;
+}
+button.ghost{background:transparent; color:var(--muted); border:1px solid var(--line); border-radius:10px; padding:11px 18px; font:inherit; font-size:.92rem; cursor:pointer}
+.seq{display:flex; flex-direction:column; gap:7px; margin-top:6px}
+.slot{
+  display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:10px;
+  border:1px dashed var(--line); background:var(--surface); font-size:.93rem; min-height:46px;
+}
+.slot.filled{border-style:solid}
+.slot .n{width:22px; height:22px; flex:none; border-radius:50%; background:var(--accent-soft); color:var(--accent);
+  font-size:.75rem; font-weight:700; display:grid; place-items:center}
+.slot.ok{border-color:var(--ok)} .slot.no{border-color:var(--bad)}
+.pool{display:flex; flex-wrap:wrap; gap:7px; margin-top:14px}
+.chip{border:1px solid var(--line); background:var(--surface); color:var(--text); border-radius:999px;
+  padding:8px 14px; font:inherit; font-size:.88rem; cursor:pointer}
+.chip:hover{border-color:var(--accent); background:var(--accent-soft)}
+.score{font-size:2.2rem; font-weight:700; letter-spacing:-.03em; margin:4px 0}
+ul.rev{list-style:none; padding:0; margin:14px 0 0; font-size:.88rem}
+ul.rev li{padding:9px 0; border-top:1px solid var(--line); color:var(--muted)}
+ul.rev li b{color:var(--text); display:block; font-weight:600}
+.hide{display:none}
+
+/* ---- 모바일 (카카오톡 인앱 브라우저 포함) ---- */
+@media (max-width:560px){
+  .wrap{padding-top:20px}
+  h1{font-size:1.3rem}
+  .sub{font-size:.85rem}
+  .card{padding:16px 15px; border-radius:12px}
+  .tabs{
+    gap:6px; margin:16px 0 14px;
+    overflow-x:auto; flex-wrap:nowrap;
+    scrollbar-width:none; -ms-overflow-style:none;
+    padding-bottom:2px;
+  }
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{flex:none; padding:10px 14px; font-size:.85rem; min-height:44px}
+  .q{font-size:1.02rem}
+  .situ{font-size:.9rem}
+  .opt{padding:14px 14px; font-size:.94rem; min-height:52px}
+  .slot{padding:12px 13px; font-size:.9rem; min-height:52px}
+  .chip{padding:11px 14px; font-size:.86rem; min-height:44px}
+  button.main, button.ghost{flex:1; min-height:48px; padding:13px 16px}
+  .row{gap:8px}
+  .score{font-size:1.9rem}
+  .fb{padding:13px 14px}
+}
+@media (max-width:360px){
+  .opt{font-size:.9rem}
+  .chip{font-size:.82rem}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>주총 진행 트레이너</h1>
+  <p class="sub">정기주주총회를 준비·진행·마무리하는 절차를 문제로 익히는 학습 게임</p>
+</header>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" data-mode="sim" aria-selected="true">① 의장 시뮬레이션</button>
+  <button class="tab" role="tab" data-mode="order" aria-selected="false">② 순서 맞추기</button>
+  <button class="tab" role="tab" data-mode="quiz" aria-selected="false">③ O/X 퀴즈</button>
+</div>
+
+<div id="app"></div>
+</div>
+
+<script>
+const SIM = [
+  { stage:"D-30 · 결산", q:"결산기가 12월 31일인 회사입니다. 정기주주총회는 언제까지 열어야 할까요?",
+    situ:"재무제표 작성이 끝나가는 시점. 일정표를 잡아야 합니다.",
+    opts:["결산기 종료 후 3개월 이내","사업연도 중 아무 때나","법인세 신고 전까지면 충분","주주가 요구할 때"],
+    a:0, law:"상법 제365조 제1항",
+    fb:"정기총회는 매년 1회 일정한 시기에 소집해야 하고, 실무상 결산기 종료 후 3개월 이내(12월 결산이면 3월 말까지)에 엽니다. 늦어지면 재무제표 승인·배당 결정이 모두 밀립니다." },
+
+  { stage:"D-21 · 소집 결정", q:"총회를 열기로 하는 '소집 결정'은 누가 합니까?",
+    situ:"이사가 3명 이상이라 이사회를 둔 회사입니다.",
+    opts:["이사회 결의로 결정한다","대표이사가 혼자 정한다","최대주주가 정한다","감사가 정한다"],
+    a:0, law:"상법 제362조",
+    fb:"원칙은 이사회 결의입니다. 다만 자본금 10억원 미만으로 이사가 1~2명이라 이사회를 두지 않는 회사는 대표이사(또는 각 이사)가 소집을 결정하고, 그 결정서를 남깁니다." },
+
+  { stage:"D-14 · 소집통지", q:"자본금 10억원 미만 회사입니다. 소집통지는 며칠 전까지 보내야 할까요?",
+    situ:"주주명부상 주주는 2명. 통지서를 준비 중입니다.",
+    opts:["총회일 10일 전","총회일 2주 전","총회일 7일 전","전날까지만 알리면 된다"],
+    a:0, law:"상법 제363조 제1항·제3항",
+    fb:"원칙은 2주 전 서면(또는 전자문서) 통지입니다. 자본금 10억원 미만 회사는 10일 전으로 단축되고, 주주 전원이 동의하면 소집절차 자체를 생략할 수도 있습니다." },
+
+  { stage:"D-14 · 소집절차 생략", q:"주주 전원의 동의로 소집절차를 생략했습니다. 무엇을 반드시 남겨야 할까요?",
+    situ:"두 주주 모두 '통지 없이 바로 열자'고 구두로 말한 상태.",
+    opts:["전원의 동의 사실을 서면(동의서)이나 의사록에 기재","아무것도 남기지 않아도 된다","녹음만 해두면 된다","통지서를 사후에 발송한다"],
+    a:0, law:"상법 제363조 제3항 단서",
+    fb:"생략 자체는 적법하지만, 동의 사실이 증명되지 않으면 결의 취소 사유가 됩니다. 동의서 서명본을 받아두고, 못 받았다면 총회 현장에서 구두 동의를 받아 의사록에 기재한 뒤 사후 서명본을 회신받으세요." },
+
+  { stage:"당일 · 개회", q:"개회 선언 직전, 의장이 가장 먼저 확인해 선언할 것은?",
+    situ:"전원 출석했고 시계는 21시 32분을 가리킵니다.",
+    opts:["출석 주식 수를 세어 정족수(성원) 충족을 보고","바로 1호 의안을 상정","참석자 자기소개","회의 녹화 종료"],
+    a:0, law:"정관 정족수 규정",
+    fb:"‘발행주식총수 ○○주 중 ○○주에 해당하는 주주가 출석해 정족수를 충족했으므로, ○시 ○분 개회를 선언합니다.’ 개회 시각과 출석 현황은 의사록의 필수 기재사항입니다." },
+
+  { stage:"당일 · 의장", q:"화상회의(Zoom)로 참석한 주주를 출석으로 볼 수 있을까요?",
+    situ:"두 주주 모두 원격 접속으로 참여했습니다.",
+    opts:["실시간 쌍방향 소통이 가능하고 주주 동의가 있으면 출석으로 처리 가능","절대 불가, 반드시 대면","위임장을 내면 출석으로 본다","의장이 혼자 정하면 된다"],
+    a:0, law:"실무 운영 · 의사록 기재",
+    fb:"음성·영상으로 즉시 질의응답이 가능한 상태면 출석으로 봅니다. 다툼을 막으려면 ‘Zoom 참석을 적법한 출석으로 본다’는 데 대한 주주 동의를 받아 의사록에 남기는 것이 안전합니다." },
+
+  { stage:"의안 1 · 재무제표", q:"재무제표 승인은 어떤 결의가 필요한가요?",
+    situ:"매출·손익·이익잉여금 처분안을 함께 올립니다.",
+    opts:["보통결의 — 출석 주주 의결권의 과반수 + 발행주식총수의 1/4 이상","특별결의 — 출석 2/3 + 발행 1/3 이상","주주 전원의 동의","이사회 결의만으로 충분"],
+    a:0, law:"상법 제368조 제1항",
+    fb:"재무제표 승인은 보통결의 사항입니다. 정관 변경·합병·영업양도 같은 회사의 근본 변화만 특별결의(출석 2/3 이상, 발행주식총수 1/3 이상)를 요구합니다." },
+
+  { stage:"의안 1 · 배당", q:"올해는 배당하지 않고 이익을 전액 이월하기로 했습니다. 어떻게 처리할까요?",
+    situ:"미처분이익잉여금을 차기로 넘기려 합니다.",
+    opts:["배당 미실시(이익잉여금 처분안)도 재무제표 승인 결의에 포함해 결의","배당이 없으니 결의할 것도 없다","이사회에서만 정한다","다음 총회로 미룬다"],
+    a:0, law:"상법 제449조 · 제462조",
+    fb:"배당을 ‘하지 않는다’는 것도 이익잉여금 처분에 관한 의사결정입니다. 처분안을 재무제표와 함께 상정해 승인받고, 의사록에 이월 금액을 적어두세요." },
+
+  { stage:"의안 2 · 보수", q:"이사의 보수는 무엇으로 정합니까?",
+    situ:"내년도 이사 보수한도를 정하려 합니다.",
+    opts:["정관에 정하지 않았다면 주주총회 결의로 정한다","대표이사가 정한다","이사회가 자율로 정한다","근로계약으로만 정한다"],
+    a:0, law:"상법 제388조",
+    fb:"정관에 액수가 없으면 주주총회 결의가 필요합니다. 실무는 총회에서 ‘총액 한도’를 승인하고, 개인별 배분은 이사회(또는 별도 결의)에 맡기는 구조를 씁니다. 이 승인을 빠뜨리면 지급된 보수의 근거가 흔들립니다." },
+
+  { stage:"의안 · 진행", q:"각 의안을 처리할 때 빠뜨리면 안 되는 3단계는?",
+    situ:"의장이 1호 의안 설명을 막 마쳤습니다.",
+    opts:["안건 설명 → 찬반 확인(“승인하시겠습니까”) → 가결 선언","설명 후 바로 다음 안건","찬반만 묻고 넘어감","서면으로만 처리"],
+    a:0, law:"결의의 성립 확인 절차",
+    fb:"‘설명 – 찬반 확인 – 가결 선언’은 결의가 성립했음을 확인하는 절차입니다. 특히 찬성 의사는 육성으로 받아 의사록에 남겨야 나중에 다툼이 없습니다." },
+
+  { stage:"의안 · 이해관계", q:"의장 본인의 보수를 정하는 안건입니다. 어떻게 진행할까요?",
+    situ:"의장이자 이사인 사람의 보수 지급액 승인 건.",
+    opts:["산정근거를 설명하고, 이해관계 없는 주주의 의견·찬성 의사를 먼저 확인해 의사록에 기재","의장이 알아서 가결 선언","비공개로 처리","안건에서 빼고 나중에 지급"],
+    a:0, law:"상법 제368조 제3항 취지",
+    fb:"자기 보수 안건은 공정성 시비가 붙기 쉽습니다. 산정근거서를 문서로 첨부하고, 이해관계 없는 주주의 찬성 의사를 육성으로 확인해 의사록에 남기는 것이 가장 안전한 진행입니다." },
+
+  { stage:"보고사항", q:"자금 운용 계획·기부 내역 같은 '보고사항'은 어떻게 처리하나요?",
+    situ:"결의를 마치고 공유 안건으로 넘어갑니다.",
+    opts:["결의 대상이 아니므로 표결하지 않고 보고·공유만 한다","보고사항도 표결한다","의사록에서 완전히 뺀다","주주 동의를 받아야 보고할 수 있다"],
+    a:0, law:"보고사항 ≠ 결의사항",
+    fb:"보고사항은 표결하지 않습니다. 다만 ‘보고했다’는 사실은 의사록에 적어두세요. 시간이 부족하면 핵심만 보고하고 나머지는 자료 송부로 갈음할 수 있습니다." },
+
+  { stage:"폐회", q:"모든 목적사항을 마쳤습니다. 폐회에서 꼭 해야 할 일은?",
+    situ:"질의응답까지 끝났습니다.",
+    opts:["질의 기회를 준 뒤 폐회를 선언하고, 폐회 시각을 의사록에 기재","그냥 회의를 끊는다","폐회 선언은 생략해도 된다","시각은 나중에 적당히 적는다"],
+    a:0, law:"상법 제373조",
+    fb:"개회·폐회 시각은 의사록의 기본 기재사항입니다. 질의 기회를 준 사실, 목적사항을 모두 마쳤다는 선언, 폐회 시각까지 순서대로 남기세요." },
+
+  { stage:"사후", q:"총회가 끝난 뒤 남은 일로 올바른 것은?",
+    situ:"녹화 파일과 초안 의사록이 있습니다.",
+    opts:["의사록 작성 → 의장·출석이사 기명날인 또는 서명 → 본점 비치 → 등기사항이면 변경등기","의사록은 필요할 때 만들면 된다","녹화 파일로 대체","서명 없이 보관만"],
+    a:0, law:"상법 제373조 · 제396조",
+    fb:"의사록에는 의장과 출석한 이사가 기명날인 또는 서명해야 하고, 본점에 비치합니다. 임원 변경처럼 등기사항이 결의됐다면 2주 내 변경등기도 잊지 마세요." },
+];
+
+const ORDER = [
+  "결산기 종료 · 재무제표 작성",
+  "소집 결정(이사회 또는 대표이사)",
+  "주주명부 확정 · 소집통지 발송(또는 전원동의로 생략)",
+  "개회 선언 · 정족수(성원) 보고",
+  "소집절차 생략 동의 확인",
+  "의안 상정 → 설명 → 찬반 확인 → 가결 선언",
+  "보고사항 공유(표결 없음)",
+  "질의응답 · 폐회 선언",
+  "의사록 작성 · 기명날인 · 후속 등기",
+];
+
+const QUIZ = [
+  { s:"정기주주총회는 매 결산기마다 1회 일정한 시기에 소집해야 한다.", a:true,
+    fb:"맞습니다. 임시총회는 필요할 때 수시로 열 수 있지만, 정기총회는 매 결산기 후 정해진 시기에 엽니다. (상법 제365조)" },
+  { s:"보통결의는 출석 주주 의결권의 과반수와 발행주식총수 4분의 1 이상의 찬성이 필요하다.", a:true,
+    fb:"맞습니다. 두 요건을 모두 채워야 합니다. (상법 제368조 제1항)" },
+  { s:"정관 변경은 보통결의로 충분하다.", a:false,
+    fb:"틀립니다. 정관 변경은 특별결의 — 출석 주주 의결권의 3분의 2 이상, 그리고 발행주식총수의 3분의 1 이상 — 가 필요합니다. (상법 제434조)" },
+  { s:"주주 전원이 동의하면 소집통지 없이도 총회를 열 수 있다.", a:true,
+    fb:"맞습니다. 다만 전원 동의 사실을 동의서나 의사록으로 반드시 증명해 두어야 합니다. (상법 제363조 제3항 단서)" },
+  { s:"보고사항도 반드시 표결로 승인받아야 한다.", a:false,
+    fb:"틀립니다. 보고사항은 결의 대상이 아니라 공유 대상입니다. 보고한 사실만 의사록에 남기면 됩니다." },
+  { s:"이사의 보수는 정관에 정함이 없으면 주주총회 결의로 정한다.", a:true,
+    fb:"맞습니다. 승인 절차를 빠뜨리면 지급된 보수의 근거가 문제 될 수 있습니다. (상법 제388조)" },
+  { s:"의사록에는 의장과 출석한 이사가 기명날인 또는 서명해야 한다.", a:true,
+    fb:"맞습니다. 작성 후 본점에 비치해야 합니다. (상법 제373조, 제396조)" },
+  { s:"배당을 하지 않기로 했다면 총회에서 따로 결의할 필요가 없다.", a:false,
+    fb:"틀립니다. 배당 미실시도 이익잉여금 처분에 관한 결정이므로, 처분안을 재무제표와 함께 승인받아야 합니다." },
+  { s:"자본금 10억원 미만 회사는 소집통지 기간이 총회일 10일 전으로 단축된다.", a:true,
+    fb:"맞습니다. 원칙은 2주 전이지만 소규모 회사는 10일 전입니다. (상법 제363조 제3항)" },
+  { s:"의장은 찬반 확인 없이 바로 가결을 선언해도 무방하다.", a:false,
+    fb:"틀립니다. ‘설명 – 찬반 확인 – 가결 선언’ 3단계를 거쳐야 결의 성립이 확인됩니다. 찬성 의사는 육성으로 받아 기록하세요." },
+];
+
+const app = document.getElementById('app');
+function toTop(){ try{ window.scrollTo({top:0, behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); } }
+let mode = 'sim';
+let st = {};
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.setAttribute('aria-selected', x === t));
+  mode = t.dataset.mode; start();
+}));
+
+function start(){
+  if(mode === 'sim')   st = {i:0, score:0, wrong:[], answered:false};
+  if(mode === 'order') st = {placed:[], checked:false};
+  if(mode === 'quiz')  st = {i:0, score:0, wrong:[], answered:false};
+  render();
+}
+
+function esc(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function render(){
+  if(mode === 'sim')   return renderCards(SIM, '의장 시뮬레이션');
+  if(mode === 'order') return renderOrder();
+  if(mode === 'quiz')  return renderQuiz();
+}
+
+/* ---------- ① 시뮬레이션 ---------- */
+function renderCards(data, label){
+  if(st.i >= data.length) return renderResult(data.length, label);
+  const q = data[st.i];
+  app.innerHTML = `
+    <div class="card">
+      <div class="meta"><span>${label}</span><span>${st.i+1} / ${data.length} · ${st.score}점</span></div>
+      <div class="bar"><i style="width:${st.i/data.length*100}%"></i></div>
+      <div class="stage">${esc(q.stage)}</div>
+      <p class="q">${esc(q.q)}</p>
+      <p class="situ">${esc(q.situ)}</p>
+      <div class="opts">${q.opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</div>
+      <div id="fb"></div>
+    </div>`;
+  app.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+    if(st.answered) return;
+    st.answered = true;
+    const pick = +b.dataset.i, ok = pick === q.a;
+    if(ok) st.score++; else st.wrong.push(q);
+    app.querySelectorAll('.opt').forEach((x,i)=>{
+      x.disabled = true;
+      if(i === q.a) x.classList.add('right');
+      else if(i === pick) x.classList.add('wrong');
+    });
+    document.getElementById('fb').innerHTML = `
+      <div class="fb"><b>${ok ? '정확합니다' : '다시 확인해 보세요'}</b>${esc(q.fb)}
+        <span class="law">근거 · ${esc(q.law)}</span></div>
+      <div class="row"><button class="main" id="next">${st.i+1 < data.length ? '다음 단계' : '결과 보기'}</button></div>`;
+    document.getElementById('next').addEventListener('click', ()=>{ st.i++; st.answered=false; render(); toTop(); });
+  }));
+}
+
+/* ---------- ② 순서 맞추기 ---------- */
+function renderOrder(){
+  const remain = ORDER.map((t,i)=>({t,i})).filter(o => !st.placed.includes(o.i));
+  const done = st.placed.length === ORDER.length;
+  const correct = st.checked ? st.placed.filter((v,i)=>v===i).length : 0;
+  app.innerHTML = `
+    <div class="card">
+      <div class="meta"><span>순서 맞추기</span><span>${st.placed.length} / ${ORDER.length}</span></div>
+      <div class="bar"><i style="width:${st.placed.length/ORDER.length*100}%"></i></div>
+      <p class="situ" style="margin-top:12px">정기주주총회를 준비부터 마무리까지 진행하는 순서대로 아래 항목을 골라 넣으세요. 잘못 넣은 항목은 눌러서 되돌릴 수 있습니다.</p>
+      <div class="seq">
+        ${ORDER.map((_,slot)=>{
+          const v = st.placed[slot];
+          if(v === undefined) return `<div class="slot"><span class="n">${slot+1}</span><span style="color:var(--muted)">비어 있음</span></div>`;
+          const cls = st.checked ? (v===slot ? 'ok' : 'no') : '';
+          return `<button class="slot filled ${cls}" data-slot="${slot}" style="cursor:${st.checked?'default':'pointer'};text-align:left;font:inherit;color:inherit">
+                    <span class="n">${slot+1}</span><span>${esc(ORDER[v])}</span></button>`;
+        }).join('')}
+      </div>
+      ${done ? '' : `<div class="pool">${remain.map(o=>`<button class="chip" data-add="${o.i}">${esc(o.t)}</button>`).join('')}</div>`}
+      ${done && !st.checked ? `<div class="row"><button class="main" id="check">채점하기</button><button class="ghost" id="reset">처음부터</button></div>` : ''}
+      ${st.checked ? `<div class="fb" style="margin-top:16px"><b>${correct} / ${ORDER.length} 정답</b>${
+          correct===ORDER.length
+            ? '완벽합니다. 소집 결정 → 통지 → 개회·정족수 → 의안 결의 → 보고 → 폐회 → 의사록까지의 흐름을 정확히 잡고 있습니다.'
+            : '초록색은 제자리, 붉은색은 위치가 다릅니다. 핵심 뼈대는 “소집 결정 → 통지(또는 전원동의 생략) → 개회·정족수 → 결의 → 보고 → 폐회 → 의사록”입니다.'
+        }</div><div class="row"><button class="main" id="reset">다시 하기</button></div>` : ''}
+    </div>`;
+  app.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', ()=>{ st.placed.push(+b.dataset.add); renderOrder(); }));
+  app.querySelectorAll('[data-slot]').forEach(b => b.addEventListener('click', ()=>{
+    if(st.checked) return;
+    st.placed.splice(+b.dataset.slot, 1); renderOrder();
+  }));
+  const c = document.getElementById('check');
+  if(c) c.addEventListener('click', ()=>{ st.checked = true; renderOrder(); });
+  const r = document.getElementById('reset');
+  if(r) r.addEventListener('click', ()=>{ st = {placed:[], checked:false}; renderOrder(); });
+}
+
+/* ---------- ③ O/X ---------- */
+function renderQuiz(){
+  if(st.i >= QUIZ.length) return renderResult(QUIZ.length, 'O/X 퀴즈');
+  const q = QUIZ[st.i];
+  app.innerHTML = `
+    <div class="card">
+      <div class="meta"><span>O/X 퀴즈</span><span>${st.i+1} / ${QUIZ.length} · ${st.score}점</span></div>
+      <div class="bar"><i style="width:${st.i/QUIZ.length*100}%"></i></div>
+      <p class="q" style="margin-top:14px">${esc(q.s)}</p>
+      <div class="opts" style="flex-direction:row;gap:10px">
+        <button class="opt" data-v="true" style="text-align:center;font-size:1.3rem;font-weight:700">O</button>
+        <button class="opt" data-v="false" style="text-align:center;font-size:1.3rem;font-weight:700">X</button>
+      </div>
+      <div id="fb"></div>
+    </div>`;
+  app.querySelectorAll('.opt').forEach(b => b.addEventListener('click', ()=>{
+    if(st.answered) return;
+    st.answered = true;
+    const pick = b.dataset.v === 'true', ok = pick === q.a;
+    if(ok) st.score++; else st.wrong.push({q:q.s, fb:q.fb});
+    app.querySelectorAll('.opt').forEach(x=>{
+      x.disabled = true;
+      const v = x.dataset.v === 'true';
+      if(v === q.a) x.classList.add('right'); else if(v === pick) x.classList.add('wrong');
+    });
+    document.getElementById('fb').innerHTML = `
+      <div class="fb"><b>${ok ? '정답' : '오답'}</b>${esc(q.fb)}</div>
+      <div class="row"><button class="main" id="next">${st.i+1 < QUIZ.length ? '다음 문제' : '결과 보기'}</button></div>`;
+    document.getElementById('next').addEventListener('click', ()=>{ st.i++; st.answered=false; render(); toTop(); });
+  }));
+}
+
+/* ---------- 결과 ---------- */
+function renderResult(total, label){
+  const pct = Math.round(st.score/total*100);
+  const grade = pct===100 ? '완벽합니다. 이대로 진행하셔도 됩니다.'
+    : pct>=80 ? '흐름을 잘 잡고 있습니다. 틀린 항목만 다시 확인하세요.'
+    : pct>=60 ? '절반 이상 맞혔습니다. 아래 내용을 한 번 더 보세요.'
+    : '기본 절차부터 다시 한 번 짚어보시길 권합니다.';
+  app.innerHTML = `
+    <div class="card">
+      <div class="meta"><span>${label} 결과</span><span>${pct}%</span></div>
+      <p class="score">${st.score} <span style="font-size:1rem;color:var(--muted);font-weight:400">/ ${total}</span></p>
+      <p class="situ">${grade}</p>
+      ${st.wrong.length ? `<ul class="rev">${st.wrong.map(w=>`<li><b>${esc(w.q||'')}</b>${esc(w.fb)}</li>`).join('')}</ul>` : ''}
+      <div class="row"><button class="main" id="again">다시 도전</button></div>
+    </div>`;
+  document.getElementById('again').addEventListener('click', start);
+}
+
+start();
+</script>
+</body>
+</html>

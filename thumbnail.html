@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>thumbnail</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1200px;height:630px;overflow:hidden;background:#fff}
+  .card{
+    width:1200px;height:630px;position:relative;
+    background:
+      radial-gradient(900px 500px at 88% -12%, #3d7565 0%, rgba(61,117,101,0) 62%),
+      linear-gradient(152deg,#21453b 0%,#2f5d50 48%,#20423a 100%);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:#f3f1ec;overflow:hidden;
+  }
+  .grid{
+    position:absolute;inset:0;opacity:.09;
+    background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);
+    background-size:60px 60px;
+    -webkit-mask-image:radial-gradient(760px 480px at 78% 10%,#000 0%,transparent 78%);
+            mask-image:radial-gradient(760px 480px at 78% 10%,#000 0%,transparent 78%);
+  }
+  .inner{position:relative;padding:76px 80px;height:100%;display:flex;flex-direction:column}
+  .kicker{
+    display:inline-flex;align-items:center;gap:11px;align-self:flex-start;
+    font-size:21px;letter-spacing:.11em;font-weight:700;color:#9fd8c3;
+    border:1.5px solid rgba(159,216,195,.42);border-radius:999px;padding:11px 22px;
+  }
+  .kicker i{width:8px;height:8px;border-radius:50%;background:#9fd8c3;display:block}
+  h1{font-size:104px;line-height:1.04;letter-spacing:-.045em;font-weight:800;margin-top:40px}
+  h1 em{font-style:normal;color:#9fd8c3}
+  p.sub{font-size:31px;color:rgba(243,241,236,.82);margin-top:26px;letter-spacing:-.018em;line-height:1.42}
+  .modes{display:flex;gap:14px;margin-top:auto}
+  .m{
+    background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);
+    border-radius:16px;padding:20px 26px;font-size:26px;font-weight:600;letter-spacing:-.018em;
+    display:flex;align-items:center;gap:13px;
+  }
+  .m span{
+    width:32px;height:32px;border-radius:9px;background:#9fd8c3;color:#20423a;
+    font-size:19px;font-weight:800;display:flex;align-items:center;justify-content:center;
+  }
+  .seal{
+    position:absolute;right:74px;top:68px;width:212px;height:212px;border-radius:50%;
+    border:3px solid rgba(159,216,195,.34);display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:5px;
+  }
+  .seal b{font-size:66px;font-weight:800;color:#9fd8c3;letter-spacing:-.05em;line-height:1}
+  .seal u{text-decoration:none;font-size:19px;color:rgba(243,241,236,.62);letter-spacing:.18em}
+  .seal:after{
+    content:"";position:absolute;inset:-17px;border-radius:50%;
+    border:1.5px dashed rgba(159,216,195,.2);
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="grid"></div>
+  <div class="seal"><b>13</b><u>AGM</u></div>
+  <div class="inner">
+    <div class="kicker"><i></i>정기주주총회 절차 학습</div>
+    <h1>주총 진행<br><em>트레이너</em></h1>
+    <p class="sub">소집부터 의사록까지, 의장이 되어 절차를 직접 짚어보는 게임</p>
+    <div class="modes">
+      <div class="m"><span>1</span>의장 시뮬레이션</div>
+      <div class="m"><span>2</span>순서 맞추기</div>
+      <div class="m"><span>3</span>O/X 퀴즈</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
